@@ -23,6 +23,23 @@ describe("path not found", () => {
 	});
 });
 
+describe("/api", () => {
+	test("GET:200 responds with an object describing all the available endpoints on your API", () => {
+		return request(app)
+			.get("/api")
+			.expect(200)
+			.then((response) => {
+				console.log(response.body.endpoints);
+				Object.values(response.body.endpoints).forEach((endpoint) => {
+					expect(typeof endpoint.description).toBe("string");
+					expect(Array.isArray(endpoint.queries)).toBe(true);
+					expect(Array.isArray(endpoint.exampleResponse)).toBe(false);
+					expect(typeof endpoint.exampleResponse).toBe("object");
+				});
+			});
+	});
+});
+
 describe("/api/topics", () => {
 	test("GET:200 responds with an array of topics", () => {
 		return request(app)
