@@ -2,6 +2,7 @@ const {
 	getTopics,
 	getArticles,
 	getArticleById,
+	deleteCommentById,
 } = require('./controllers/controllers')
 
 const {
@@ -16,6 +17,8 @@ const app = express()
 app.get('/api/topics', getTopics)
 
 app.get('/api/articles/:article_id', getArticleById)
+
+app.delete('/api/comments/:comment_id', deleteCommentById)
 
 //For all requests that come in that haven't been dealt with in the chain (if we go to any other end point), send the client { message: "path not found" }
 app.all('/*', (req, res) => {
