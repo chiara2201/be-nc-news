@@ -23,41 +23,6 @@ describe('path not found', () => {
 	})
 })
 
-
-		return request(app)
-			.get('/api/articles')
-			.expect(200)
-			.then((response) => {
-				return console.log(response.body.articles)
-				expect(response.body.articles.length).toBe(data.articleData.length)
-				response.body.articles.forEach((article) => {
-					expect(typeof article.title).toBe('string')
-					expect(typeof article.topic).toBe('string')
-					expect(typeof article.author).toBe('string')
-					expect(typeof article.body).toBe('string')
-					expect(typeof article.created_at).toBe('string')
-					expect(typeof article.votes).toBe('number')
-					expect(typeof article.article_img_url).toBe('string')
-				})
-			})
-	})
-
-	test('GET:200 responds with an array of article objects sorted by date in descending order.', () => {
-		return request(app)
-			.get('/api/articles')
-			.then((response) => {
-				const { articles } = response.body
-
-				const sortedArticles = [...articles].sort(
-					// convert date string back into number (ms since epoch)
-					(a1, a2) => Date.parse(a1.created_at) - Date.parse(a2.created_at)
-				)
-
-				console.log(sortedArticles)
-			})
-	})
-})
-
 describe('GET /api/articles/:article_id', () => {
 	test('responds with 200 status code', () => {
 		return request(app).get('/api/articles/1').expect(200)

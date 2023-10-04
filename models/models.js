@@ -6,14 +6,6 @@ exports.fetchTopics = () => {
 	})
 }
 
-exports.fetchArticles = () => {
-	const query =
-		'SELECT * FROM articles JOIN comments ON articles.article_id = comments.article_id ORDER BY articles.created_at ;'
-	return db.query(query).then((result) => {
-		return result.rows
-	})
-}
-
 exports.fetchArticleById = (articleId) => {
 	return db
 		.query('SELECT * FROM articles WHERE article_id = $1;', [articleId])
@@ -28,5 +20,4 @@ exports.fetchArticleById = (articleId) => {
 			}
 			return fetchedArticle
 		})
-	//.catch((err) => console.log(err.message)) //postgres err
 }
