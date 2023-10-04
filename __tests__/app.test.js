@@ -23,6 +23,38 @@ describe('path not found', () => {
 	})
 })
 
+describe('/api', () => {
+	test('GET:200 responds with an object describing all the available endpoints on your API', () => {
+		return request(app)
+			.get('/api')
+			.expect(200)
+			.then((response) => {
+				console.log(response.body.endpoints)
+				Object.values(response.body.endpoints).forEach((endpoint) => {
+					expect(typeof endpoint.description).toBe('string')
+					expect(Array.isArray(endpoint.queries)).toBe(true)
+					expect(Array.isArray(endpoint.exampleResponse)).toBe(false)
+					expect(typeof endpoint.exampleResponse).toBe('object')
+				})
+			})
+	})
+})
+
+describe('/api/topics', () => {
+	test('GET:200 responds with an array of topics', () => {
+		return request(app)
+			.get('/api/topics')
+			.expect(200)
+			.then((response) => {
+				expect(response.body.topics.length).toBe(3)
+				response.body.topics.forEach((topic) => {
+					expect(typeof topic.slug).toBe('string')
+					expect(typeof topic.description).toBe('string')
+				})
+			})
+	})
+})
+
 describe('GET /api/articles/:article_id', () => {
 	test('responds with 200 status code', () => {
 		return request(app).get('/api/articles/1').expect(200)
@@ -54,6 +86,57 @@ describe('GET /api/articles/:article_id', () => {
 	test('GET:400 sends an appropriate status and error message when given an invalid id', () => {
 		return request(app)
 			.get('/api/articles/not-an-article')
+			.expect(400)
+			.then((response) => {
+				expect(response.body.message).toBe('Bad request')
+			})
+	})
+})
+
+describe('/api/articles/:article_id/comments', () => {
+	test('GET:200 responds with an array of comments for the given article_id', () => {
+		return request(app)
+			.get('/api/articles/1/comments')
+			.expect(200)
+			.then((response) => {
+				expect(response.body.comments.length).toBe(11)
+				response.body.comments.forEach((comment) => {
+					expect(typeof comment.comment_id).toBe('number')
+					expect(typeof comment.votes).toBe('number')
+					expect(typeof comment.created_at).toBe('string')
+					expect(typeof comment.author).toBe('string')
+					expect(typeof comment.body).toBe('string')
+					expect(comment.article_id).toBe(1)
+				})
+			})
+	})
+
+	test('GET:200 responds with an array of article objects sorted by creation date in descending order', () => {
+		return request(app)
+			.get('/api/articles/1/comments')
+			.then((response) => {
+				const { comments } = response.body
+
+				const sortedComments = [...comments].sort(
+					// convert date string back into number (ms since epoch)
+					(a1, a2) => Date.parse(a2.created_at) - Date.parse(a1.created_at)
+				)
+
+				expect(comments).toEqual(sortedComments)
+			})
+	})
+
+	test('GET:404 sends an appropriate status and error message when given a valid but non-existent id', () => {
+		return request(app)
+			.get('/api/articles/999/comments')
+			.expect(404)
+			.then((response) => {
+				expect(response.body.message).toBe('no comments found')
+			})
+	})
+	test('GET:400 responds with an appropriate error message when given an invalid id', () => {
+		return request(app)
+			.get('/api/articles/not-an-id/comments')
 			.expect(400)
 			.then((response) => {
 				expect(response.body.message).toBe('Bad request')
