@@ -2,6 +2,7 @@ const {
 	getTopics,
 	getArticles,
 	getArticleById,
+	patchArticleById,
 } = require('./controllers/controllers')
 
 const {
@@ -13,9 +14,13 @@ const {
 const express = require('express')
 const app = express()
 
+app.use(express.json())
+
 app.get('/api/topics', getTopics)
 
 app.get('/api/articles/:article_id', getArticleById)
+
+app.patch('/api/articles/:article_id', patchArticleById)
 
 //For all requests that come in that haven't been dealt with in the chain (if we go to any other end point), send the client { message: "path not found" }
 app.all('/*', (req, res) => {
