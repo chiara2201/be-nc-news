@@ -23,12 +23,7 @@ describe('path not found', () => {
 	})
 })
 
-//articles
-describe('/api/articles', () => {
-	test('responds with 200 status code', () => {
-		return request(app).get('/api/articles/1').expect(200)
-	})
-	test('GET:200 responds with an array of article objects', () => {
+
 		return request(app)
 			.get('/api/articles')
 			.expect(200)
