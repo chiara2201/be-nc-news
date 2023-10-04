@@ -32,7 +32,7 @@ describe('GET /api/articles/:article_id', () => {
 			.get('/api/articles/1')
 			.then(({ body }) => {
 				expect(body.article.title).toBe('Living in the shadow of a great man')
-				expect(body.article.topic).toBe('mitch')
+				expect(body.article.user).toBe('mitch')
 				expect(body.article.author).toBe('butter_bridge')
 				expect(body.article.body).toBe('I find this existence challenging')
 				expect(body.article.created_at).toBe('2020-07-09T20:11:00.000Z')
@@ -57,6 +57,23 @@ describe('GET /api/articles/:article_id', () => {
 			.expect(400)
 			.then((response) => {
 				expect(response.body.message).toBe('Bad request')
+			})
+	})
+})
+
+describe('/api/users', () => {
+	test('GET:200 responds with an array of users', () => {
+		return request(app)
+			.get('/api/users')
+			.expect(200)
+			.then((response) => {
+				console.log(response.body.users)
+				expect(response.body.users.length).toBe(4)
+				response.body.users.forEach((user) => {
+					expect(typeof user.username).toBe('string')
+					expect(typeof user.name).toBe('string')
+					expect(typeof user.avatar_url).toBe('string')
+				})
 			})
 	})
 })

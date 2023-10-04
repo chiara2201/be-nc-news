@@ -21,3 +21,9 @@ exports.fetchArticleById = (articleId) => {
 			return fetchedArticle
 		})
 }
+
+exports.fetchUsers = () => {
+	return db.query('SELECT * FROM users;').then((result) => {
+		return result.rows
+	})
+}
