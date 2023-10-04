@@ -60,3 +60,42 @@ describe('GET /api/articles/:article_id', () => {
 			})
 	})
 })
+
+//to be placed later in the /api/articles/:article_id/comments describe block with GET
+describe('POST /api/articles/:article_id/comments', () => {
+	test('POST:201 inserts a new comment to the db and sends it back to the client', () => {
+		const newComment = {
+			username: 'icellusedkars',
+			body: 'hello',
+		}
+		return request(app)
+			.post('/api/articles/4/comments')
+			.send(newComment)
+			.expect(201)
+			.then((response) => {
+				expect(response.body.comment.body).toBe('hello')
+				expect(response.body.comment.author).toBe('icellusedkars')
+				expect(response.body.comment.article_id).toBe(4)
+			})
+	})
+	test('POST:400 responds with an appropriate status and error message when provided with a malformed body', () => {
+		return request(app)
+			.post('/api/articles/4/comments')
+			.send({ username: 'icellusedkars' })
+			.expect(400)
+			.then((response) => {
+				expect(response.body.message).toBe('Bad request')
+			})
+	})
+	test.only('POST:400 responds with an appropriate status and error message after failing schema validation e.g. author absence', () => {
+		return (
+			request(app)
+				.post('/api/articles/4/comments')
+				.send({ username: 'chiara' })
+				// .expect(400)
+				.then((response) => {
+					expect(response.body.message).toBe('Bad request')
+				})
+		)
+	})
+})

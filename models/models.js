@@ -21,3 +21,14 @@ exports.fetchArticleById = (articleId) => {
 			return fetchedArticle
 		})
 }
+
+exports.createComment = (article_id, newComment) => {
+	return db
+		.query(
+			`INSERT INTO comments (article_id, body, author) VALUES ($1, $2, $3) RETURNING *;`,
+			[article_id, newComment.body, newComment.username]
+		)
+		.then((result) => {
+			return result.rows[0]
+		})
+}
