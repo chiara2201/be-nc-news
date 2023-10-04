@@ -32,7 +32,7 @@ describe('GET /api/articles/:article_id', () => {
 			.get('/api/articles/1')
 			.then(({ body }) => {
 				expect(body.article.title).toBe('Living in the shadow of a great man')
-				expect(body.article.user).toBe('mitch')
+				expect(body.article.topic).toBe('mitch')
 				expect(body.article.author).toBe('butter_bridge')
 				expect(body.article.body).toBe('I find this existence challenging')
 				expect(body.article.created_at).toBe('2020-07-09T20:11:00.000Z')
