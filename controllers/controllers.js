@@ -1,12 +1,8 @@
 const {
 	fetchTopics,
-<<<<<<< HEAD
-	fetchArticleById,
 	updateArticle,
-=======
 	fetchArticles,
 	fetchArticleById,
->>>>>>> main
 } = require('../models/models')
 
 exports.getTopics = (req, res) => {
