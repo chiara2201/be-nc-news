@@ -26,7 +26,10 @@ exports.postComment = (req, res, next) => {
 	const newComment = req.body
 	const { article_id } = req.params
 
-	createComment(article_id, newComment)
+	fetchArticleById(article_id)
+		.then((article) => {
+			return createComment(article_id, newComment)
+		})
 		.then((insertedComment) => {
 			res.status(201).send({ comment: insertedComment })
 		})

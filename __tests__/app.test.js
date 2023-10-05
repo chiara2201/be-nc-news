@@ -87,15 +87,37 @@ describe('POST /api/articles/:article_id/comments', () => {
 				expect(response.body.message).toBe('Bad request')
 			})
 	})
-	test.only('POST:400 responds with an appropriate status and error message after failing schema validation e.g. author absence', () => {
-		return (
-			request(app)
-				.post('/api/articles/4/comments')
-				.send({ username: 'chiara' })
-				// .expect(400)
-				.then((response) => {
-					expect(response.body.message).toBe('Bad request')
-				})
-		)
+	test('POST:400 responds with an appropriate status and error message after failing schema validation e.g. author absence', () => {
+		return request(app)
+			.post('/api/articles/4/comments')
+			.send({ username: 'chiara' })
+			.expect(400)
+			.then((response) => {
+				expect(response.body.message).toBe('Bad request')
+			})
+	})
+
+	test('POST: 404 sends an appropriate status and error message when given a valid but non-existent article id ', () => {
+		return request(app)
+			.post('/api/articles/1000/comments')
+			.send({ username: 'icellusedkars', body: 'hello' })
+			.expect(404)
+			.then((response) => {
+				expect(response.body.message).toBe('article id does not exist')
+			})
+	})
+
+	test('POST: 400 sends an appropriate status and error message when given an invalid article id', () => {
+		return request(app)
+			.post('/api/articles/banana/comments')
+			.send({ username: 'icellusedkars', body: 'hello' })
+			.expect(400)
+			.then((response) => {
+				expect(response.body.message).toBe('Bad request')
+			})
 	})
 })
+
+// // 400 posting to invalid article id eg. /articles/10000/comments
+//  404 posting to valid but non existent id eg. /articles/banana/comments
+//  404 username isn't in the database
