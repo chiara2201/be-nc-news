@@ -1,6 +1,7 @@
 const {
 	getEndpoints,
 	getTopics,
+	getArticles,
 	getArticleById,
 	getCommentsByArticleId,
 } = require('./controllers/controllers')

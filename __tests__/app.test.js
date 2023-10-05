@@ -51,6 +51,9 @@ describe('/api/topics', () => {
 					expect(typeof topic.slug).toBe('string')
 					expect(typeof topic.description).toBe('string')
 				})
+			})
+	})
+})
 
 describe('/api/articles', () => {
 	test('responds with 200 status code', () => {
@@ -83,11 +86,10 @@ describe('/api/articles', () => {
 
 				const sortedArticles = [...articles].sort(
 					// convert date string back into number (ms since epoch)
-					(a1, a2) => Date.parse(a1.created_at) - Date.parse(a2.created_at)
+					(a1, a2) => Date.parse(a2.created_at) - Date.parse(a1.created_at)
 				)
 
-				console.log(sortedArticles)
-
+				expect(articles).toEqual(sortedArticles)
 			})
 	})
 })
@@ -148,6 +150,15 @@ describe('/api/articles/:article_id/comments', () => {
 			})
 	})
 
+	test('GET:200 responds with an empty array if article has no comments', () => {
+		return request(app)
+			.get('/api/articles/2/comments') // article 2 does not have any comments
+			.expect(200)
+			.then((response) => {
+				expect(response.body.comments).toHaveLength(0)
+			})
+	})
+
 	test('GET:200 responds with an array of article objects sorted by creation date in descending order', () => {
 		return request(app)
 			.get('/api/articles/1/comments')
@@ -168,7 +179,7 @@ describe('/api/articles/:article_id/comments', () => {
 			.get('/api/articles/999/comments')
 			.expect(404)
 			.then((response) => {
-				expect(response.body.message).toBe('no comments found')
+				expect(response.body.message).toBe('article id does not exist')
 			})
 	})
 	test('GET:400 responds with an appropriate error message when given an invalid id', () => {
