@@ -51,6 +51,43 @@ describe('/api/topics', () => {
 					expect(typeof topic.slug).toBe('string')
 					expect(typeof topic.description).toBe('string')
 				})
+
+describe('/api/articles', () => {
+	test('responds with 200 status code', () => {
+		return request(app).get('/api/articles/1').expect(200)
+	})
+	test('GET:200 responds with an array of correct article objects', () => {
+		return request(app)
+			.get('/api/articles')
+			.expect(200)
+			.then((response) => {
+				expect(response.body.articles.length).toBe(data.articleData.length)
+				response.body.articles.forEach((article) => {
+					expect(typeof article.article_id).toBe('number')
+					expect(typeof article.title).toBe('string')
+					expect(typeof article.topic).toBe('string')
+					expect(typeof article.author).toBe('string')
+					expect(typeof article.created_at).toBe('string')
+					expect(typeof article.votes).toBe('number')
+					expect(typeof article.article_img_url).toBe('string')
+					expect(typeof article.comment_count).toBe('string') //need to convert it if we are expecting the result as number instead
+				})
+			})
+	})
+
+	test('GET:200 responds with an array of article objects sorted by date in descending order.', () => {
+		return request(app)
+			.get('/api/articles')
+			.then((response) => {
+				const { articles } = response.body
+
+				const sortedArticles = [...articles].sort(
+					// convert date string back into number (ms since epoch)
+					(a1, a2) => Date.parse(a1.created_at) - Date.parse(a2.created_at)
+				)
+
+				console.log(sortedArticles)
+
 			})
 	})
 })
