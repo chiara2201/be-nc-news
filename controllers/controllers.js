@@ -11,7 +11,8 @@ exports.getTopics = (req, res) => {
 }
 
 exports.getArticles = (req, res) => {
-	fetchArticles().then((articles) => {
+	const { topic } = req.query
+	fetchArticles(topic).then((articles) => {
 		res.status(200).send({ articles })
 	})
 }

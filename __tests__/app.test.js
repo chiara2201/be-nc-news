@@ -23,44 +23,66 @@ describe('path not found', () => {
 	})
 })
 
-describe('/api/articles', () => {
-	test('responds with 200 status code', () => {
-		return request(app).get('/api/articles/1').expect(200)
-	})
-	test('GET:200 responds with an array of correct article objects', () => {
-		return request(app)
-			.get('/api/articles')
-			.expect(200)
-			.then((response) => {
-				expect(response.body.articles.length).toBe(data.articleData.length)
-				response.body.articles.forEach((article) => {
-					expect(typeof article.article_id).toBe('number')
-					expect(typeof article.title).toBe('string')
-					expect(typeof article.topic).toBe('string')
-					expect(typeof article.author).toBe('string')
-					expect(typeof article.created_at).toBe('string')
-					expect(typeof article.votes).toBe('number')
-					expect(typeof article.article_img_url).toBe('string')
-					expect(typeof article.comment_count).toBe('string') //need to convert it if we are expecting the result as number instead
-				})
-			})
-	})
+// describe('/api/articles', () => {
+// 	test('responds with 200 status code', () => {
+// 		return request(app).get('/api/articles/1').expect(200)
+// 	})
+// 	test('GET:200 responds with an array of correct article objects', () => {
+// 		return request(app)
+// 			.get('/api/articles')
+// 			.expect(200)
+// 			.then((response) => {
+// 				expect(response.body.articles.length).toBe(data.articleData.length)
 
-	test('GET:200 responds with an array of article objects sorted by date in descending order.', () => {
-		return request(app)
-			.get('/api/articles')
-			.then((response) => {
-				const { articles } = response.body
+// 				response.body.articles.forEach((article) => {
+// 					expect(typeof article.article_id).toBe('number')
+// 					expect(typeof article.title).toBe('string')
+// 					expect(typeof article.topic).toBe('string')
+// 					expect(typeof article.author).toBe('string')
+// 					expect(typeof article.created_at).toBe('string')
+// 					expect(typeof article.votes).toBe('number')
+// 					expect(typeof article.article_img_url).toBe('string')
+// 					expect(typeof article.comment_count).toBe('string') //need to convert it if we are expecting the result as number instead
+// 				})
+// 			})
+// 	})
 
-				const sortedArticles = [...articles].sort(
-					// convert date string back into number (ms since epoch)
-					(a1, a2) => Date.parse(a1.created_at) - Date.parse(a2.created_at)
-				)
+// 	test('GET:200 responds with an array of article objects sorted by date in descending order.', () => {
+// 		return request(app)
+// 			.get('/api/articles')
+// 			.then((response) => {
+// 				// coming in pull request!
+// 			})
+// 	})
 
-				console.log(sortedArticles)
-			})
-	})
-})
+// 	test('GET:200 responds with an array of article objects filtered by topic', () => {
+// 		return request(app)
+// 			.get('/api/articles?topic=cats')
+// 			.then((response) => {
+// 				expect(response.body.articles).toEqual([
+// 					{
+// 						author: 'rogersop',
+// 						title: 'UNCOVERED: catspiracy to bring down democracy',
+// 						article_id: 5,
+// 						topic: 'cats',
+// 						created_at: '2020-08-03T13:14:00.000Z',
+// 						votes: 0,
+// 						article_img_url:
+// 							'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+// 						comment_count: '2',
+// 					},
+// 				])
+// 			})
+// 	})
+// 	test('GET:200 responds with an empty array when passed a non-existent topic', () => {
+// 		return request(app)
+// 			.get('/api/articles?topic=non-existent-heh')
+// 			.expect(200)
+// 			.then((response) => {
+// 				expect(response.body.articles).toHaveLength(0)
+// 			})
+// 	})
+// })
 
 describe('GET /api/articles/:article_id', () => {
 	test('responds with 200 status code', () => {

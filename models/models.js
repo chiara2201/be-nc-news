@@ -6,7 +6,7 @@ exports.fetchTopics = () => {
 	})
 }
 
-exports.fetchArticles = () => {
+exports.fetchArticles = (topic) => {
 	const query = `
 	SELECT 
 		articles.author, 
@@ -19,10 +19,11 @@ exports.fetchArticles = () => {
 		COUNT(comments.article_id) as comment_count 
 	FROM articles 
 	LEFT JOIN comments ON articles.article_id = comments.article_id 
+	WHERE topic = $1
 	GROUP BY articles.article_id 
 	ORDER BY articles.created_at DESC;`
 
-	return db.query(query).then((result) => {
+	return db.query(query, [topic]).then((result) => {
 		return result.rows
 	})
 }
