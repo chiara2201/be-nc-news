@@ -132,7 +132,6 @@ describe('GET /api/articles/:article_id', () => {
 	})
 })
 
-
 describe('/api/comments/:comment_id', () => {
 	test('DELETE:204 deletes the specified comment and sends no body back', () => {
 		return request(app).delete('/api/comments/3').expect(204)
@@ -146,8 +145,9 @@ describe('/api/comments/:comment_id', () => {
 			})
 	})
 	test('DELETE:400 responds with an appropriate status and error message when given an invalid id', () => {
-		return request(app)
-			.delete('/api/comments/not-a-comment')
+		return request(app).delete('/api/comments/not-a-comment')
+	})
+})
 
 //to be placed later in the /api/articles/:article_id/comments describe block with GET
 describe('POST /api/articles/:article_id/comments', () => {

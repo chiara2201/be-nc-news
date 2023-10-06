@@ -3,7 +3,7 @@ const {
 	fetchTopics,
 	fetchArticles,
 	fetchArticleById,
-  removeCommentById
+	removeCommentById,
 	fetchCommentsByArticleId,
 	createComment,
 } = require('../models/models')
@@ -11,7 +11,6 @@ const {
 exports.getEndpoints = (req, res) => {
 	res.status(200).send({ endpoints })
 }
-
 
 exports.getTopics = (req, res) => {
 	fetchTopics().then((topics) => {
@@ -37,14 +36,18 @@ exports.getArticleById = (req, res, next) => {
 		})
 }
 
-
 exports.deleteCommentById = (req, res, next) => {
 	const { comment_id } = req.params
 
 	removeCommentById(comment_id)
 		.then((deletedComment) => {
 			res.status(204).send()
-  
+		})
+		.catch((err) => {
+			next(err)
+		})
+}
+
 exports.postComment = (req, res, next) => {
 	const newComment = req.body
 	const { article_id } = req.params
@@ -75,7 +78,6 @@ exports.getCommentsByArticleId = (req, res, next) => {
 		})
 		.then((comments) => {
 			res.status(200).send({ comments })
-
 		})
 		.catch((err) => {
 			next(err)

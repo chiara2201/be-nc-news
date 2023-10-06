@@ -43,7 +43,6 @@ exports.fetchArticleById = (articleId) => {
 		})
 }
 
-
 exports.removeCommentById = (comment_id) => {
 	return db
 		.query(
@@ -61,6 +60,8 @@ exports.removeCommentById = (comment_id) => {
 					message: 'comment does not exist',
 				})
 			} else return result.rows[0]
+		})
+}
 
 exports.createComment = (article_id, newComment) => {
 	return db
@@ -81,6 +82,5 @@ exports.fetchCommentsByArticleId = (articleId) => {
 		)
 		.then((result) => {
 			return result.rows
-
 		})
 }
