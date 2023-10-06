@@ -132,6 +132,23 @@ describe('GET /api/articles/:article_id', () => {
 	})
 })
 
+
+describe('/api/comments/:comment_id', () => {
+	test('DELETE:204 deletes the specified comment and sends no body back', () => {
+		return request(app).delete('/api/comments/3').expect(204)
+	})
+	test('DELETE:404 responds with an appropriate status and error message when given a non-existent id', () => {
+		return request(app)
+			.delete('/api/comments/999')
+			.expect(404)
+			.then((response) => {
+				expect(response.body.message).toBe('comment does not exist')
+			})
+	})
+	test('DELETE:400 responds with an appropriate status and error message when given an invalid id', () => {
+		return request(app)
+			.delete('/api/comments/not-a-comment')
+
 //to be placed later in the /api/articles/:article_id/comments describe block with GET
 describe('POST /api/articles/:article_id/comments', () => {
 	test('POST:201 inserts a new comment to the db and sends it back to the client', () => {

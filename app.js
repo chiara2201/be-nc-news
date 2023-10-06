@@ -3,8 +3,10 @@ const {
 	getTopics,
 	getArticles,
 	getArticleById,
+	deleteCommentById,
 	postComment,
 	getCommentsByArticleId,
+
 } = require('./controllers/controllers')
 
 const {
@@ -24,6 +26,8 @@ app.get('/api/topics', getTopics)
 app.get('/api/articles', getArticles)
 
 app.get('/api/articles/:article_id', getArticleById)
+
+app.delete('/api/comments/:comment_id', deleteCommentById)
 
 app.post('/api/articles/:article_id/comments', postComment)
 
