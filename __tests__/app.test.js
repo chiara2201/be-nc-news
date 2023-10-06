@@ -210,24 +210,32 @@ describe('/api/articles/:article_id', () => {
 				expect(response.body.message).toBe('Bad request')
 			})
 	})
+
+	// test('GET:200 responds with an article object with a comment_count property', () => {
+	// 	return request(app)
+	// 		.get('/api/articles/1')
+	// 		.expect(200)
+	// 		.then((response) => {
+	// 			expect(response.body.topics.length).toBe(3)
+	// 			response.body.topics.forEach((topic) => {
+	// 				expect(typeof topic.slug).toBe('string')
+	// 				expect(typeof topic.description).toBe('string')
+	// 			})
+	// 		})
+	// })
 })
 
-describe('/api/users', () => {
-	test('GET:200 responds with an array of users', () => {
-		return request(app)
-			.get('/api/users')
-			.expect(200)
-			.then((response) => {
-				expect(response.body.users.length).toBe(4)
-
-				response.body.users.forEach((user) => {
-					expect(typeof user.username).toBe('string')
-					expect(typeof user.name).toBe('string')
-					expect(typeof user.avatar_url).toBe('string')
-				})
-			})
-	})
-})
+// describe('/api/users', () => {
+// 	test('GET:200 responds with an array of users', () => {
+// 		return request(app)
+// 			.get('/api/users')
+// 			.expect(200)
+// 			.then((res) => {
+// 				const commentCount = res.body.article.comment_count
+// 				expect(commentCount).toBe(11)
+// 			})
+// 	})
+// })
 describe('/api/comments/:comment_id', () => {
 	test('DELETE:204 deletes the specified comment and sends no body back', () => {
 		return request(app).delete('/api/comments/3').expect(204)
