@@ -172,72 +172,19 @@ describe('POST /api/articles/:article_id/comments', () => {
 		return request(app)
 			.post('/api/articles/1000/comments')
 			.send({ username: 'icellusedkars', body: 'hello' })
-=======
-describe('/api/articles/:article_id/comments', () => {
-	test('GET:200 responds with an array of comments for the given article_id', () => {
-		return request(app)
-			.get('/api/articles/1/comments')
-			.expect(200)
-			.then((response) => {
-				expect(response.body.comments.length).toBe(11)
-				response.body.comments.forEach((comment) => {
-					expect(typeof comment.comment_id).toBe('number')
-					expect(typeof comment.votes).toBe('number')
-					expect(typeof comment.created_at).toBe('string')
-					expect(typeof comment.author).toBe('string')
-					expect(typeof comment.body).toBe('string')
-					expect(comment.article_id).toBe(1)
-				})
-			})
-	})
-
-	test('GET:200 responds with an empty array if article has no comments', () => {
-		return request(app)
-			.get('/api/articles/2/comments') // article 2 does not have any comments
-			.expect(200)
-			.then((response) => {
-				expect(response.body.comments).toHaveLength(0)
-			})
-	})
-
-	test('GET:200 responds with an array of article objects sorted by creation date in descending order', () => {
-		return request(app)
-			.get('/api/articles/1/comments')
-			.then((response) => {
-				const { comments } = response.body
-
-				const sortedComments = [...comments].sort(
-					// convert date string back into number (ms since epoch)
-					(a1, a2) => Date.parse(a2.created_at) - Date.parse(a1.created_at)
-				)
-
-				expect(comments).toEqual(sortedComments)
-			})
-	})
-
-	test('GET:404 sends an appropriate status and error message when given a valid but non-existent id', () => {
-		return request(app)
-			.get('/api/articles/999/comments')
-
 			.expect(404)
 			.then((response) => {
 				expect(response.body.message).toBe('article id does not exist')
 			})
 	})
 
-
 	test('POST: 400 sends an appropriate status and error message when given an invalid article id', () => {
 		return request(app)
 			.post('/api/articles/banana/comments')
 			.send({ username: 'icellusedkars', body: 'hello' })
-
-	test('GET:400 responds with an appropriate error message when given an invalid id', () => {
-		return request(app)
-			.get('/api/articles/not-an-id/comments')
 			.expect(400)
 			.then((response) => {
 				expect(response.body.message).toBe('Bad request')
 			})
 	})
 })
-

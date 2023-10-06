@@ -43,7 +43,6 @@ exports.fetchArticleById = (articleId) => {
 		})
 }
 
-
 exports.createComment = (article_id, newComment) => {
 	return db
 		.query(
@@ -52,6 +51,8 @@ exports.createComment = (article_id, newComment) => {
 		)
 		.then((result) => {
 			return result.rows[0]
+		})
+}
 
 exports.fetchCommentsByArticleId = (articleId) => {
 	return db
@@ -61,6 +62,5 @@ exports.fetchCommentsByArticleId = (articleId) => {
 		)
 		.then((result) => {
 			return result.rows
-
 		})
 }
