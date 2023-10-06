@@ -132,6 +132,47 @@ describe('GET /api/articles/:article_id', () => {
 	})
 })
 
+//to be placed later in the /api/articles/:article_id/comments describe block with GET
+describe('POST /api/articles/:article_id/comments', () => {
+	test('POST:201 inserts a new comment to the db and sends it back to the client', () => {
+		const newComment = {
+			username: 'icellusedkars',
+			body: 'hello',
+		}
+		return request(app)
+			.post('/api/articles/4/comments')
+			.send(newComment)
+			.expect(201)
+			.then((response) => {
+				expect(response.body.comment.body).toBe('hello')
+				expect(response.body.comment.author).toBe('icellusedkars')
+				expect(response.body.comment.article_id).toBe(4)
+			})
+	})
+	test('POST:400 responds with an appropriate status and error message when provided with a malformed body', () => {
+		return request(app)
+			.post('/api/articles/4/comments')
+			.send({ username: 'icellusedkars' })
+			.expect(400)
+			.then((response) => {
+				expect(response.body.message).toBe('Bad request')
+			})
+	})
+	test('POST:400 responds with an appropriate status and error message after failing schema validation e.g. author absence', () => {
+		return request(app)
+			.post('/api/articles/4/comments')
+			.send({ username: 'chiara' })
+			.expect(400)
+			.then((response) => {
+				expect(response.body.message).toBe('Bad request')
+			})
+	})
+
+	test('POST: 404 sends an appropriate status and error message when given a valid but non-existent article id ', () => {
+		return request(app)
+			.post('/api/articles/1000/comments')
+			.send({ username: 'icellusedkars', body: 'hello' })
+=======
 describe('/api/articles/:article_id/comments', () => {
 	test('GET:200 responds with an array of comments for the given article_id', () => {
 		return request(app)
@@ -177,11 +218,19 @@ describe('/api/articles/:article_id/comments', () => {
 	test('GET:404 sends an appropriate status and error message when given a valid but non-existent id', () => {
 		return request(app)
 			.get('/api/articles/999/comments')
+
 			.expect(404)
 			.then((response) => {
 				expect(response.body.message).toBe('article id does not exist')
 			})
 	})
+
+
+	test('POST: 400 sends an appropriate status and error message when given an invalid article id', () => {
+		return request(app)
+			.post('/api/articles/banana/comments')
+			.send({ username: 'icellusedkars', body: 'hello' })
+
 	test('GET:400 responds with an appropriate error message when given an invalid id', () => {
 		return request(app)
 			.get('/api/articles/not-an-id/comments')
@@ -191,3 +240,4 @@ describe('/api/articles/:article_id/comments', () => {
 			})
 	})
 })
+
