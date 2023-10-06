@@ -1,8 +1,12 @@
 const {
+	getEndpoints,
 	getTopics,
 	getArticles,
 	getArticleById,
 	deleteCommentById,
+	postComment,
+	getCommentsByArticleId,
+
 } = require('./controllers/controllers')
 
 const {
@@ -13,12 +17,22 @@ const {
 
 const express = require('express')
 const app = express()
+app.use(express.json()) //Brings in request body
+
+app.get('/api', getEndpoints)
 
 app.get('/api/topics', getTopics)
+
+app.get('/api/articles', getArticles)
 
 app.get('/api/articles/:article_id', getArticleById)
 
 app.delete('/api/comments/:comment_id', deleteCommentById)
+
+app.post('/api/articles/:article_id/comments', postComment)
+
+app.get('/api/articles/:article_id/comments', getCommentsByArticleId)
+
 
 //For all requests that come in that haven't been dealt with in the chain (if we go to any other end point), send the client { message: "path not found" }
 app.all('/*', (req, res) => {
