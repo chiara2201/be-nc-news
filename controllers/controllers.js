@@ -1,6 +1,7 @@
 const endpoints = require('../endpoints.json') //Passing require() with the path to a JSON fie will synchronously read and parse the data into a javascript object
 const {
 	fetchTopics,
+	updateArticle,
 	fetchArticles,
 	fetchArticleById,
 	fetchUsers,
@@ -31,6 +32,22 @@ exports.getArticleById = (req, res, next) => {
 	fetchArticleById(article_id)
 		.then((article) => {
 			res.status(200).send({ article })
+		})
+		.catch((err) => {
+			next(err)
+		})
+}
+
+exports.patchArticleById = (req, res, next) => {
+	const { article_id } = req.params
+	const delta = req.body.inc_votes
+
+	fetchArticleById(article_id)
+		.then((article) => {
+			return updateArticle(delta, article_id)
+		})
+		.then((updatedArticle) => {
+			res.status(200).send({ article: updatedArticle })
 		})
 		.catch((err) => {
 			next(err)

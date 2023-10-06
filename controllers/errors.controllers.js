@@ -3,6 +3,11 @@ exports.handlePSQLErrors = (err, req, res, next) => {
 	const isPSQLErr = psqlErrCodes.includes(err.code)
 
 	if (isPSQLErr) {
+		console.log({
+			code: err.code,
+			message: err.message,
+		})
+
 		res.status(400).send({ message: 'Bad request' })
 	} else next(err)
 }

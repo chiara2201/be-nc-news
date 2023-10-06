@@ -3,6 +3,7 @@ const {
 	getTopics,
 	getArticles,
 	getArticleById,
+	patchArticleById,
 	getUsers,
 	deleteCommentById,
 	postComment,
@@ -21,13 +22,17 @@ app.use(express.json()) //Brings in request body
 
 app.get('/api', getEndpoints)
 
+app.use(express.json())
+
 app.get('/api/topics', getTopics)
+
+app.get('/api/users', getUsers)
 
 app.get('/api/articles', getArticles)
 
 app.get('/api/articles/:article_id', getArticleById)
 
-app.get('/api/users', getUsers)
+app.patch('/api/articles/:article_id', patchArticleById)
 
 app.post('/api/articles/:article_id/comments', postComment)
 

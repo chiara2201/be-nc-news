@@ -43,6 +43,22 @@ exports.fetchArticleById = (articleId) => {
 		})
 }
 
+exports.updateArticle = (delta, article_id) => {
+	return db
+		.query(
+			`
+		UPDATE articles 
+		SET votes = votes + $1
+		WHERE article_id = $2
+		RETURNING *
+	`,
+			[delta, article_id]
+		)
+		.then((result) => {
+			return result.rows[0]
+		})
+}
+
 exports.fetchUsers = () => {
 	return db.query('SELECT * FROM users;').then((result) => {
 		return result.rows
