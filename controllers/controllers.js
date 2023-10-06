@@ -3,6 +3,7 @@ const {
 	fetchTopics,
 	fetchArticles,
 	fetchArticleById,
+	fetchUsers,
 	removeCommentById,
 	fetchCommentsByArticleId,
 	createComment,
@@ -36,6 +37,11 @@ exports.getArticleById = (req, res, next) => {
 		})
 }
 
+exports.getUsers = (req, res) => {
+	fetchUsers().then((users) => {
+		res.status(200).send({ users })
+	})
+}
 exports.deleteCommentById = (req, res, next) => {
 	const { comment_id } = req.params
 

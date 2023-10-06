@@ -43,6 +43,11 @@ exports.fetchArticleById = (articleId) => {
 		})
 }
 
+exports.fetchUsers = () => {
+	return db.query('SELECT * FROM users;').then((result) => {
+		return result.rows
+	})
+}
 exports.removeCommentById = (comment_id) => {
 	return db
 		.query(

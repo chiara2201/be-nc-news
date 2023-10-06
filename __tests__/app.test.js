@@ -132,6 +132,22 @@ describe('GET /api/articles/:article_id', () => {
 	})
 })
 
+describe('/api/users', () => {
+	test('GET:200 responds with an array of users', () => {
+		return request(app)
+			.get('/api/users')
+			.expect(200)
+			.then((response) => {
+				console.log(response.body.users)
+				expect(response.body.users.length).toBe(4)
+				response.body.users.forEach((user) => {
+					expect(typeof user.username).toBe('string')
+					expect(typeof user.name).toBe('string')
+					expect(typeof user.avatar_url).toBe('string')
+				})
+			})
+	})
+})
 describe('/api/comments/:comment_id', () => {
 	test('DELETE:204 deletes the specified comment and sends no body back', () => {
 		return request(app).delete('/api/comments/3').expect(204)
