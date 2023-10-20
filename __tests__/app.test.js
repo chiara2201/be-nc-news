@@ -30,7 +30,6 @@ describe('/api', () => {
 			.get('/api')
 			.expect(200)
 			.then((response) => {
-				console.log(response.body.endpoints)
 				Object.values(response.body.endpoints).forEach((endpoint) => {
 					expect(typeof endpoint.description).toBe('string')
 					expect(Array.isArray(endpoint.queries)).toBe(true)
@@ -291,7 +290,7 @@ describe('/api/articles/:article_id/comments', () => {
 			.get('/api/articles/999/comments')
 			.expect(404)
 			.then((response) => {
-				expect(response.body.message).toBe('no comments found')
+				expect(response.body.message).toBe('article id does not exist')
 			})
 	})
 	test('GET:400 responds with an appropriate error message when given an invalid id', () => {

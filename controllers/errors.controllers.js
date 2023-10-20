@@ -3,11 +3,6 @@ exports.handlePSQLErrors = (err, req, res, next) => {
 	const isPSQLErr = psqlErrCodes.includes(err.code)
 
 	if (isPSQLErr) {
-		console.log({
-			code: err.code,
-			message: err.message,
-		})
-
 		res.status(400).send({ message: 'Bad request' })
 	} else next(err)
 }
@@ -20,5 +15,6 @@ exports.handleCustomErrors = (err, req, res, next) => {
 }
 
 exports.handle500Errors = (err, req, res, next) => {
+	console.log(err.message)
 	res.status(500).send({ message: 'Internal Server Error' })
 }
