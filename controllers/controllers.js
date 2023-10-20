@@ -92,11 +92,6 @@ exports.getCommentsByArticleId = (req, res, next) => {
 
 	fetchArticleById(article_id)
 		.then((article) => {
-			return createComment(article_id, newComment)
-		})
-		.then((insertedComment) => {
-			res.status(201).send({ comment: insertedComment })
-
 			return fetchCommentsByArticleId(article_id)
 		})
 		.then((comments) => {

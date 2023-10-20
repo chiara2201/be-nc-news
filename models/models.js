@@ -102,6 +102,15 @@ exports.fetchCommentsByArticleId = (articleId) => {
 			[articleId]
 		)
 		.then((result) => {
-			return result.rows
+			const fetchedComments = result.rows
+			if (fetchedComments.length === 0) {
+				//resource does not exist
+				return Promise.reject({
+					//forces this into the .catch() in the controller
+					status: 404,
+					message: 'no comments found',
+				})
+			}
+			return fetchedComments
 		})
 }

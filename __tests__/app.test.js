@@ -253,8 +253,55 @@ describe('/api/comments/:comment_id', () => {
 	})
 })
 
-//to be placed later in the /api/articles/:article_id/comments describe block with GET
-describe('POST /api/articles/:article_id/comments', () => {
+describe('/api/articles/:article_id/comments', () => {
+	test('GET:200 responds with an array of comments for the given article_id', () => {
+		return request(app)
+			.get('/api/articles/1/comments')
+			.expect(200)
+			.then((response) => {
+				expect(response.body.comments.length).toBe(11)
+				response.body.comments.forEach((comment) => {
+					expect(typeof comment.comment_id).toBe('number')
+					expect(typeof comment.votes).toBe('number')
+					expect(typeof comment.created_at).toBe('string')
+					expect(typeof comment.author).toBe('string')
+					expect(typeof comment.body).toBe('string')
+					expect(comment.article_id).toBe(1)
+				})
+			})
+	})
+
+	test('GET:200 responds with an array of article objects sorted by creation date in descending order', () => {
+		return request(app)
+			.get('/api/articles/1/comments')
+			.then((response) => {
+				const { comments } = response.body
+
+				const sortedComments = [...comments].sort(
+					// convert date string back into number (ms since epoch)
+					(a1, a2) => Date.parse(a2.created_at) - Date.parse(a1.created_at)
+				)
+
+				expect(comments).toEqual(sortedComments)
+			})
+	})
+
+	test('GET:404 sends an appropriate status and error message when given a valid but non-existent id', () => {
+		return request(app)
+			.get('/api/articles/999/comments')
+			.expect(404)
+			.then((response) => {
+				expect(response.body.message).toBe('no comments found')
+			})
+	})
+	test('GET:400 responds with an appropriate error message when given an invalid id', () => {
+		return request(app)
+			.get('/api/articles/not-an-id/comments')
+			.expect(400)
+			.then((response) => {
+				expect(response.body.message).toBe('Bad request')
+			})
+	})
 	test('POST:201 inserts a new comment to the db and sends it back to the client', () => {
 		const newComment = {
 			username: 'icellusedkars',
