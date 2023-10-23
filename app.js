@@ -1,3 +1,5 @@
+const cors = require('cors')
+
 const {
 	getEndpoints,
 	getTopics,
@@ -18,6 +20,9 @@ const {
 
 const express = require('express')
 const app = express()
+
+app.use(cors())
+
 app.use(express.json()) //Brings in request body
 
 app.get('/api', getEndpoints)
