@@ -88,8 +88,39 @@ describe('/api/articles', () => {
 					// convert date string back into number (ms since epoch)
 					(a1, a2) => Date.parse(a2.created_at) - Date.parse(a1.created_at)
 				)
+				expect(articles).toEqual(sortedArticles)
+			})
+	})
+
+
+	test('GET:200 responds with an array of article objects filtered by topic', () => {
+		return request(app)
+			.get('/api/articles?topic=cats')
+			.then((response) => {
+				expect(response.body.articles).toEqual([
+					{
+						author: 'rogersop',
+						title: 'UNCOVERED: catspiracy to bring down democracy',
+						article_id: 5,
+						topic: 'cats',
+						created_at: '2020-08-03T13:14:00.000Z',
+						votes: 0,
+						article_img_url:
+							'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+						comment_count: '2',
+					},
+				])
+			})
+	})
+	test('GET:200 responds with an empty array when passed a non-existent topic', () => {
+		return request(app)
+			.get('/api/articles?topic=non-existent-hehe')
+			.expect(200)
+			.then((response) => {
+				expect(response.body.articles).toHaveLength(0)
 
 				expect(articles).toEqual(sortedArticles)
+
 			})
 	})
 })
