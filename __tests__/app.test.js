@@ -3,6 +3,7 @@ const request = require('supertest')
 const db = require('../db/connection')
 const seed = require('../db/seeds/seed')
 const data = require('../db/data/test-data/index')
+const { CLIENT_RENEG_LIMIT } = require('tls')
 
 beforeEach(() => {
 	return seed(data)
@@ -19,6 +20,37 @@ describe('path not found', () => {
 			.expect(404)
 			.then((response) => {
 				expect(response.body.message).toBe('path not found')
+			})
+	})
+})
+
+describe('/api', () => {
+	test('GET:200 responds with an object describing all the available endpoints on your API', () => {
+		return request(app)
+			.get('/api')
+			.expect(200)
+			.then((response) => {
+				Object.values(response.body.endpoints).forEach((endpoint) => {
+					expect(typeof endpoint.description).toBe('string')
+					expect(Array.isArray(endpoint.queries)).toBe(true)
+					expect(Array.isArray(endpoint.exampleResponse)).toBe(false)
+					expect(typeof endpoint.exampleResponse).toBe('object')
+				})
+			})
+	})
+})
+
+describe('/api/topics', () => {
+	test('GET:200 responds with an array of topics', () => {
+		return request(app)
+			.get('/api/topics')
+			.expect(200)
+			.then((response) => {
+				expect(response.body.topics.length).toBe(3)
+				response.body.topics.forEach((topic) => {
+					expect(typeof topic.slug).toBe('string')
+					expect(typeof topic.description).toBe('string')
+				})
 			})
 	})
 })
@@ -60,6 +92,7 @@ describe('/api/articles', () => {
 			})
 	})
 
+
 	test('GET:200 responds with an array of article objects filtered by topic', () => {
 		return request(app)
 			.get('/api/articles?topic=cats')
@@ -85,11 +118,14 @@ describe('/api/articles', () => {
 			.expect(200)
 			.then((response) => {
 				expect(response.body.articles).toHaveLength(0)
+
+				expect(articles).toEqual(sortedArticles)
+
 			})
 	})
 })
 
-describe('GET /api/articles/:article_id', () => {
+describe('/api/articles/:article_id', () => {
 	test('responds with 200 status code', () => {
 		return request(app).get('/api/articles/1').expect(200)
 	})
@@ -120,6 +156,230 @@ describe('GET /api/articles/:article_id', () => {
 	test('GET:400 sends an appropriate status and error message when given an invalid id', () => {
 		return request(app)
 			.get('/api/articles/not-an-article')
+			.expect(400)
+			.then((response) => {
+				expect(response.body.message).toBe('Bad request')
+			})
+	})
+
+	test('PATCH:200 responds with updated article, with incremented votes property', () => {
+		const articleUpdate = {
+			inc_votes: 2,
+		}
+		return request(app)
+			.patch('/api/articles/1')
+			.send(articleUpdate)
+			.expect(200)
+			.then((response) => {
+				const article = response.body.article
+
+				expect(article).toEqual({
+					article_id: 1,
+					title: 'Living in the shadow of a great man',
+					topic: 'mitch',
+					author: 'butter_bridge',
+					body: 'I find this existence challenging',
+					created_at: '2020-07-09T20:11:00.000Z',
+					votes: 102,
+					article_img_url:
+						'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+				})
+			})
+	})
+
+	test('PATCH:400 responds with an error message when provided with a malformed request body', () => {
+		const articleUpdate = {}
+
+		return request(app)
+			.patch('/api/articles/1')
+			.send(articleUpdate)
+			.expect(400)
+			.then((response) => {
+				const message = response.body.message
+
+				expect(message).toBe('Bad request')
+			})
+	})
+
+	test('PATCH: 404 sends an appropriate status and error message when given a valid but non-existent article id', () => {
+		const articleUpdate = {
+			inc_votes: 2,
+		}
+
+		return request(app)
+			.patch('/api/articles/1000')
+			.send(articleUpdate)
+			.expect(404)
+			.then((response) => {
+				expect(response.body.message).toBe('article id does not exist')
+			})
+	})
+
+	test('PATCH: 400 sends an appropriate status and error message when given an invalid', () => {
+		const articleUpdate = {
+			inc_votes: 2,
+		}
+
+		return request(app)
+			.patch('/api/articles/banana')
+			.send(articleUpdate)
+			.expect(400)
+			.then((response) => {
+				expect(response.body.message).toBe('Bad request')
+			})
+	})
+
+	test('PATCH:400 responds with an appropriate status and error message when provided with a malformed body', () => {
+		const articleUpdate = { inc_votes: 'banana' }
+
+		return request(app)
+			.patch('/api/articles/1')
+			.send(articleUpdate)
+			.expect(400)
+			.then((response) => {
+				expect(response.body.message).toBe('Bad request')
+			})
+	})
+
+	// test('GET:200 responds with an article object with a comment_count property', () => {
+	// 	return request(app)
+	// 		.get('/api/articles/1')
+	// 		.expect(200)
+	// 		.then((response) => {
+	// 			expect(response.body.topics.length).toBe(3)
+	// 			response.body.topics.forEach((topic) => {
+	// 				expect(typeof topic.slug).toBe('string')
+	// 				expect(typeof topic.description).toBe('string')
+	// 			})
+	// 		})
+	// })
+})
+
+// describe('/api/users', () => {
+// 	test('GET:200 responds with an array of users', () => {
+// 		return request(app)
+// 			.get('/api/users')
+// 			.expect(200)
+// 			.then((res) => {
+// 				const commentCount = res.body.article.comment_count
+// 				expect(commentCount).toBe(11)
+// 			})
+// 	})
+// })
+describe('/api/comments/:comment_id', () => {
+	test('DELETE:204 deletes the specified comment and sends no body back', () => {
+		return request(app).delete('/api/comments/3').expect(204)
+	})
+	test('DELETE:404 responds with an appropriate status and error message when given a non-existent id', () => {
+		return request(app)
+			.delete('/api/comments/999')
+			.expect(404)
+			.then((response) => {
+				expect(response.body.message).toBe('comment does not exist')
+			})
+	})
+	test('DELETE:400 responds with an appropriate status and error message when given an invalid id', () => {
+		return request(app).delete('/api/comments/not-a-comment')
+	})
+})
+
+describe('/api/articles/:article_id/comments', () => {
+	test('GET:200 responds with an array of comments for the given article_id', () => {
+		return request(app)
+			.get('/api/articles/1/comments')
+			.expect(200)
+			.then((response) => {
+				expect(response.body.comments.length).toBe(11)
+				response.body.comments.forEach((comment) => {
+					expect(typeof comment.comment_id).toBe('number')
+					expect(typeof comment.votes).toBe('number')
+					expect(typeof comment.created_at).toBe('string')
+					expect(typeof comment.author).toBe('string')
+					expect(typeof comment.body).toBe('string')
+					expect(comment.article_id).toBe(1)
+				})
+			})
+	})
+
+	test('GET:200 responds with an array of article objects sorted by creation date in descending order', () => {
+		return request(app)
+			.get('/api/articles/1/comments')
+			.then((response) => {
+				const { comments } = response.body
+
+				const sortedComments = [...comments].sort(
+					// convert date string back into number (ms since epoch)
+					(a1, a2) => Date.parse(a2.created_at) - Date.parse(a1.created_at)
+				)
+
+				expect(comments).toEqual(sortedComments)
+			})
+	})
+
+	test('GET:404 sends an appropriate status and error message when given a valid but non-existent id', () => {
+		return request(app)
+			.get('/api/articles/999/comments')
+			.expect(404)
+			.then((response) => {
+				expect(response.body.message).toBe('article id does not exist')
+			})
+	})
+	test('GET:400 responds with an appropriate error message when given an invalid id', () => {
+		return request(app)
+			.get('/api/articles/not-an-id/comments')
+			.expect(400)
+			.then((response) => {
+				expect(response.body.message).toBe('Bad request')
+			})
+	})
+	test('POST:201 inserts a new comment to the db and sends it back to the client', () => {
+		const newComment = {
+			username: 'icellusedkars',
+			body: 'hello',
+		}
+		return request(app)
+			.post('/api/articles/4/comments')
+			.send(newComment)
+			.expect(201)
+			.then((response) => {
+				expect(response.body.comment.body).toBe('hello')
+				expect(response.body.comment.author).toBe('icellusedkars')
+				expect(response.body.comment.article_id).toBe(4)
+			})
+	})
+	test('POST:400 responds with an appropriate status and error message when provided with a malformed body', () => {
+		return request(app)
+			.post('/api/articles/4/comments')
+			.send({ username: 'icellusedkars' })
+			.expect(400)
+			.then((response) => {
+				expect(response.body.message).toBe('Bad request')
+			})
+	})
+	test('POST:400 responds with an appropriate status and error message after failing schema validation e.g. author absence', () => {
+		return request(app)
+			.post('/api/articles/4/comments')
+			.send({ username: 'chiara' })
+			.expect(400)
+			.then((response) => {
+				expect(response.body.message).toBe('Bad request')
+			})
+	})
+
+	test('POST: 404 sends an appropriate status and error message when given a valid but non-existent article id ', () => {
+		return request(app)
+			.post('/api/articles/1000/comments')
+			.send({ username: 'icellusedkars', body: 'hello' })
+			.expect(404)
+			.then((response) => {
+				expect(response.body.message).toBe('article id does not exist')
+			})
+	})
+
+	test('POST: 400 sends an appropriate status and error message when given an invalid article id', () => {
+		return request(app)
+			.post('/api/articles/banana/comments')
+			.send({ username: 'icellusedkars', body: 'hello' })
 			.expect(400)
 			.then((response) => {
 				expect(response.body.message).toBe('Bad request')
